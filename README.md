@@ -21,13 +21,6 @@ Open `index.html` in a browser. That's it.
 3. In **Settings → Pages**, set **Branch: `main` / root**. Wait for the green link.
 4. Your app will be live at `https://<your-username>.github.io/kanban-board/`.
 
-## Deploy (Netlify)
-
-- Drag-drop this folder to https://app.netlify.com/drop or connect repo. **Build command:** _none_, **Publish directory:** `/`.
-
-## Deploy (Vercel)
-
-- Import the repo in https://vercel.com/new, Framework preset **"Other"**, Output directory `/`.
 
 ## Tech
 
