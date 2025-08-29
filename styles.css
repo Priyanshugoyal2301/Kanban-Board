@@ -1,0 +1,113 @@
+/* styles.css */
+
+/* Overall board background */
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #eb21e5 0%, #2a5298 100%);
+  margin: 0;
+  padding: 0;
+  color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* Header */
+header {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Columns */
+.kanban-column {
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+  border-radius: 16px;
+  padding: 1rem;
+  margin: 0.5rem;
+  flex: 1;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  backdrop-filter: blur(6px);
+  transition: transform 0.2s ease;
+}
+
+.kanban-column:hover {
+  transform: translateY(-5px);
+}
+
+/* Column Titles */
+.kanban-column h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: #444;
+}
+
+/* Tasks */
+.task {
+  background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+  color: #fff;
+  padding: 0.75rem;
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  cursor: grab;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.task:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+button {
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.9rem; /* adjusted to match other buttons */
+  cursor: pointer;
+  font-weight: 500; /* lighter than bold */
+  font-size: 0.9rem; /* keep consistent with UI */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Input Fields */
+input, textarea, select {
+  background: rgba(255,255,255,0.8);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.5rem;
+  width: 100%;
+  outline: none;
+  margin-bottom: 0.75rem;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #764ba2;
+  box-shadow: 0 0 6px rgba(118,75,162,0.5);
+}
+/* Style for the + New Board button */
+#newBoardBtn {
+  background: linear-gradient(90deg, #444) !important;
+  color: white !important;
+  border: none;
+  border-radius: 12px; /* smoother than Tailwind's */
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#newBoardBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}

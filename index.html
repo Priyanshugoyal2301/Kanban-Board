@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Minimal Kanban — Priyanshu</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="icon" href="assets/kanban.svg">
+  <meta name="description" content="A lightweight Kanban board with drag & drop, filters, sorting, and local backup."/>
+  <style>
+    /* Smooth drag placeholder */
+    .drag-over { outline: 2px dashed rgba(255,255,255,.4); outline-offset: 4px; border-radius: 12px; }
+    .handle { cursor: grab; }
+    .handle:active { cursor: grabbing; }
+    .scrollbar::-webkit-scrollbar { height: 10px; width: 10px; }
+    .scrollbar::-webkit-scrollbar-thumb { border-radius: 9999px; }
+  </style>
+</head>
+<body class="min-h-screen bg-neutral-950 text-neutral-100 selection:bg-indigo-500/40">
+  <header class="border-b border-white/10 sticky top-0 z-20 bg-neutral-950/70 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
+      <img src="assets/kanban.svg" class="w-6 h-6" alt="logo">
+      <h1 class="text-lg font-semibold">Kanban Board</h1>
+      <span class="text-xs px-2 py-0.5 rounded-full bg-neutral-800/80 border border-white/10">offline-first</span>
+
+      <div class="ml-auto flex items-center gap-2">
+        <select id="boardSelect" class="bg-neutral-900 border border-white/10 rounded-xl px-3 py-2 text-sm"></select>
+        <button id="newBoardBtn" class="px-3 py-2 rounded-xl text-sm">+ New Board</button>
+        <button id="exportBtn" class="px-3 py-2 rounded-xl bg-neutral-900 border border-white/10 text-sm">Export</button>
+        <label class="px-3 py-2 rounded-xl bg-neutral-900 border border-white/10 text-sm cursor-pointer">
+          Import <input id="importInput" type="file" accept="application/json" class="hidden">
+        </label>
+        <a href="https://github.com/Priyanshugoyal2301" target="_blank" class="text-xs opacity-60 hover:opacity-100">?</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-4">
+    <!-- Controls -->
+    <section class="grid md:grid-cols-5 gap-3">
+      <input id="searchInput" placeholder="Search title/description…" class="md:col-span-2 bg-neutral-900 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-indigo-600"/>
+      <select id="filterPriority" class="bg-neutral-900 border border-white/10 rounded-xl px-3 py-3 text-sm">
+        <option value="">All priorities</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+      <select id="filterCategory" class="bg-neutral-900 border border-white/10 rounded-xl px-3 py-3 text-sm">
+        <option value="">All categories</option>
+        <option>General</option>
+        <option>Bug</option>
+        <option>Feature</option>
+        <option>Docs</option>
+      </select>
+      <select id="sortSelect" class="bg-neutral-900 border border-white/10 rounded-xl px-3 py-3 text-sm">
+        <option value="createdAt_desc">Sort: Newest</option>
+        <option value="createdAt_asc">Sort: Oldest</option>
+        <option value="dueDate_asc">Due date ↑</option>
+        <option value="dueDate_desc">Due date ↓</option>
+        <option value="priority_desc">Priority High→Low</option>
+        <option value="priority_asc">Priority Low→High</option>
+      </select>
+    </section>
+
+    <!-- Board columns -->
+    <section class="grid md:grid-cols-3 gap-4">
+      <!-- Column -->
+      <div data-column="todo" class="rounded-2xl border border-white/10 bg-neutral-900/60 p-3 flex flex-col">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="font-semibold">To Do</h2>
+          <button class="newTaskBtn text-xs px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20" data-column="todo">+ Task</button>
+        </div>
+        <div class="colBody space-y-3 min-h-[200px] flex-1" id="todoCol"></div>
+      </div>
+
+      <div data-column="inprogress" class="rounded-2xl border border-white/10 bg-neutral-900/60 p-3 flex flex-col">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="font-semibold">In Progress</h2>
+          <button class="newTaskBtn text-xs px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20" data-column="inprogress">+ Task</button>
+        </div>
+        <div class="colBody space-y-3 min-h-[200px] flex-1" id="inprogressCol"></div>
+      </div>
+
+      <div data-column="done" class="rounded-2xl border border-white/10 bg-neutral-900/60 p-3 flex flex-col">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="font-semibold">Done</h2>
+          <button class="newTaskBtn text-xs px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20" data-column="done">+ Task</button>
+        </div>
+        <div class="colBody space-y-3 min-h-[200px] flex-1" id="doneCol"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Task modal -->
+  <dialog id="taskDialog" class="rounded-2xl backdrop:bg-black/60 bg-neutral-900 text-neutral-100 border border-white/10 w-11/12 md:w-[520px]">
+    <form id="taskForm" method="dialog" class="p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 id="dialogTitle" class="font-semibold">New Task</h3>
+        <button type="button" id="closeDialog" class="text-sm opacity-60 hover:opacity-100">✕</button>
+      </div>
+      <input type="hidden" id="taskId">
+      <input type="hidden" id="taskColumn">
+      <label class="block text-sm">Title
+        <input id="title" required class="mt-1 w-full bg-neutral-800 border border-white/10 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-600"/>
+      </label>
+      <label class="block text-sm">Description
+        <textarea id="description" rows="3" class="mt-1 w-full bg-neutral-800 border border-white/10 rounded-xl px-3 py-2 outline-none"></textarea>
+      </label>
+      <div class="grid grid-cols-3 gap-2 text-sm">
+        <label>Priority
+          <select id="priority" class="mt-1 w-full bg-neutral-800 border border-white/10 rounded-xl px-3 py-2">
+            <option>Low</option><option selected>Medium</option><option>High</option>
+          </select>
+        </label>
+        <label>Category
+          <input id="category" placeholder="General" class="mt-1 w-full bg-neutral-800 border border-white/10 rounded-xl px-3 py-2"/>
+        </label>
+        <label>Due date
+          <input id="dueDate" type="date" class="mt-1 w-full bg-neutral-800 border border-white/10 rounded-xl px-3 py-2"/>
+        </label>
+      </div>
+      <div class="flex items-center justify-between pt-2">
+        <button type="submit" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500">Save</button>
+        <button type="button" id="deleteBtn" class="px-3 py-2 rounded-xl bg-red-600/80 hover:bg-red-600 hidden">Delete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="main.js"></script>
+</body>
+</html>
